@@ -15,7 +15,8 @@ from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import Task, User
 
-JWT_SECRET = os.getenv("JWT_SECRET", "change-this-secret-in-production-env")
+# Read secret key from env or fallback for local development
+JWT_SECRET = os.getenv("JWT_SECRET", os.getenv("SECRET_KEY", "change-this-secret-in-production-env"))
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_HOURS = 24
 
@@ -153,9 +154,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="TaskFlow API", version="0.6.0", lifespan=lifespan)
 
+# Allow multiple origins separated by comma from CORS_ORIGINS environment variable
+raw_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
+allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins if allowed_origins else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
