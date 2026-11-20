@@ -1,14 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
-export default function PageTransition({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function TransitionContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
@@ -40,5 +36,17 @@ export default function PageTransition({
         {children}
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+export default function PageTransition({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense fallback={<div className="relative min-h-screen w-full">{children}</div>}>
+      <TransitionContent>{children}</TransitionContent>
+    </Suspense>
   );
 }
