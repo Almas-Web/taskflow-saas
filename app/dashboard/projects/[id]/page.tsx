@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -35,7 +35,7 @@ const FALLBACK_PROJECT: ProjectItem = {
   accent: "from-violet-500 to-fuchsia-500",
 };
 
-export default function ProjectDetailsPage() {
+function ProjectDetailsContent() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const projectId = params?.id || "tf-101";
@@ -275,5 +275,13 @@ export default function ProjectDetailsPage() {
         )}
       </section>
     </DashboardShell>
+  );
+}
+
+export default function ProjectDetailsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProjectDetailsContent />
+    </Suspense>
   );
 }
